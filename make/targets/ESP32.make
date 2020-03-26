@@ -1,5 +1,7 @@
 ESP_ZIP     = $(PROJ_NAME).tgz
 
+SOURCES += targets/esp32/jshardwareRMT.c
+
 $(PROJ_NAME).bin: $(OBJS)
 	$(LD) $(LDFLAGS) -o $(PROJ_NAME).elf -Wl,--start-group $(LIBS) $(OBJS) -Wl,--end-group
 	python $(ESP_IDF_PATH)/components/esptool_py/esptool/esptool.py \
