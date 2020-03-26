@@ -106,18 +106,18 @@ void neopixel_handleInterrupt(void *arg){
   portBASE_TYPE taskAwoken = 0;
   
   //if (RMT.int_st.ch0_tx_thr_event)
-  if ( RMT.int_st & (0x01000000 << i) )
+  if ( RMT.int_st.val & (0x01000000 << i) )
 	{
     neopixel_copy(i);
 	
-	RMT.int_clr=RMT.int_clr || (0x01000000 << i);				// RMT.int_clr.ch0_tx_thr_event = 1;
+	RMT.int_clr=RMT.int_clr.val || (0x01000000 << i);				// RMT.int_clr.ch0_tx_thr_event = 1;
 	}
   //else if (RMT.int_st.ch0_tx_end && neopixel_sem)
-  else if ( (RMT.int_st & (0x00000001 << (i*3))) && neopixel_sem )
+  else if ( (RMT.int_st.val & (0x00000001 << (i*3))) && neopixel_sem )
 	{
     xSemaphoreGiveFromISR(neopixel_sem, &taskAwoken);
     
-	RMT.int_clr=RMT.int_clr || (0x00000001 << (i*3));			// RMT.int_clr.ch0_tx_end = 1;
+	RMT.int_clr=RMT.int_clr.val || (0x00000001 << (i*3));			// RMT.int_clr.ch0_tx_end = 1;
 	}
 	
   return;
@@ -153,8 +153,8 @@ int neopixel_init(int gpioNum){
   RMT.tx_lim_ch[i].limit = MAX_PULSES;
   
   // config bits depending of channel
-  RMT.int_ena=RMT.int_ena || (0x01000000 << i);					// RMT.int_ena.ch?_tx_thr_event = 1;
-  RMT.int_ena=RMT.int_ena || (0x00000001 << (i*3));				// RMT.int_ena.ch?_tx_end = 1;
+  RMT.int_ena=RMT.int_ena.val || (0x01000000 << i);					// RMT.int_ena.ch?_tx_thr_event = 1;
+  RMT.int_ena=RMT.int_ena.val || (0x00000001 << (i*3));				// RMT.int_ena.ch?_tx_end = 1;
   
   neopixel_bits[0].level0 = 1;
   neopixel_bits[0].level1 = 0;
