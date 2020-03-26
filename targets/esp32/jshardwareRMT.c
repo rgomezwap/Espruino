@@ -17,6 +17,7 @@
  */
  
 #include "jsutils.h"
+#include "jshardwareRMT.h"
 
 #include "driver/rmt.h"
 
