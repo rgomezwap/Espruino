@@ -26,6 +26,7 @@ This file is part of Espruino, a JavaScript interpreter for Microcontrollers
 #include <soc/gpio_reg.h>
 #include <rom/ets_sys.h>
 
+#include "jshardware.h"
 #include "esp32_neopixel.h"
 #include "jshardwareRMT.h"
 
