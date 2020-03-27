@@ -193,24 +193,19 @@ bool esp32_neopixelWrite_RMT(Pin pin,unsigned char *rgbData, size_t rgbSize)
   
   int i;		// RMT channel
   
-  jsWarn("API RMT debug : start neopixel write\n");				// RIC DEBUG
   i=neopixel_init(pin);
   if (i >=0)
 	{
-	jsWarn("API RMT debug : RMT channel %d\n",i);				// RIC DEBUG
 	neopixel_buffer = rgbData;
 	neopixel_len = rgbSize;
 	neopixel_pos = 0;
 	neopixel_half = 0;
 	neopixel_copy(i);
 	if (neopixel_pos < neopixel_len) neopixel_copy(i);
-	jsWarn("API RMT debug : Create semaphore for Neopixel\n");	// RIC DEBUG
 	neopixel_sem = xSemaphoreCreateBinary();
 	RMT.conf_ch[i].conf1.mem_rd_rst = 1;
 	RMT.conf_ch[i].conf1.tx_start = 1;
-	jsWarn("API RMT debug : Waiting semaphore\n");				// RIC DEBUG
 	xSemaphoreTake(neopixel_sem, portMAX_DELAY);
-	jsWarn("API RMT debug : semaphore free\n");					// RIC DEBUG
 	vSemaphoreDelete(neopixel_sem);
 	neopixel_sem = NULL;
 	return true;
