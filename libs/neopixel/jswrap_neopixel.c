@@ -23,9 +23,6 @@
 #endif
 #ifdef ESP32
 	#include "esp32_neopixel.h"
-	#include "driver/gpio.h"
-	#include "soc/gpio_reg.h"
-	#include "rom/ets_sys.h"
 #endif
 #ifdef WIO_LTE
 #include "stm32_ws2812b_driver.h"
@@ -59,6 +56,9 @@ implementation on some devices - hence this library to simplify things.
   "params" : [
     ["pin", "pin", "The Pin the LEDs are connected to"],
     ["data","JsVar","The data to write to the LED strip (must be a multiple of 3 bytes long)"]
+	["options","JsVar",["Actually we can define for ESP32 if it uses GPIO or RMT",
+						"useRMT = true for RMT to drive Neopixels"
+					   ]]
   ]
 }
 Write to a strip of NeoPixel/WS281x/APA104/APA106/SK6812-style LEDs
@@ -109,7 +109,8 @@ a pullup resistor to 5v on STM32 based boards (nRF52 are not 5v tolerant
 so you can't do this), or can use a level shifter to shift the voltage up
 into the 5v range.
 */
-void jswrap_neopixel_write(Pin pin, JsVar *data) {
+void jswrap_neopixel_write(Pin pin, JsVar *data , JsVar *options)
+{
   JSV_GET_AS_CHAR_ARRAY(rgbData, rgbSize, data);
   if (!rgbData) {
     jsExceptionHere(JSET_ERROR, "Couldn't convert %t to data to send to LEDs", data);
@@ -123,8 +124,17 @@ void jswrap_neopixel_write(Pin pin, JsVar *data) {
     jsExceptionHere(JSET_ERROR, "Data length must be a multiple of 3 (RGB).");
     return;
   }
-
+  
+  #if defined(ESP32)
+	if (jsvGetBoolAndUnLock(jsvObjectGetChild(options, "useRMT", 0)))
+		{
+		esp32_neopixelWrite_RMT(pin,(unsigned char *)rgbData, rgbSize);
+		return;
+		}
+  #endif
+  
   neopixelWrite(pin, (unsigned char *)rgbData, rgbSize);
+  
 }
 
 
@@ -294,80 +304,14 @@ bool neopixelWrite(Pin pin, unsigned char *rgbData, size_t rgbSize) {
 
 #elif defined(ESP32)
 
-/* Neopixel drive by RMT subsystem
-	bool neopixelWrite(Pin pin, unsigned char *rgbData, size_t rgbSize)
-		{
-		return esp32_neopixelWrite(pin,rgbData, rgbSize);
-		}
-*/
-
-/* Neopixel drive by GPIO timed loop */
-
-static uint32_t _getCycleCount(void) __attribute__((always_inline));
-
-static inline uint32_t _getCycleCount(void)
-{
-  uint32_t ccount;
-  __asm__ __volatile__("rsr %0,ccount":"=a" (ccount));
-  return ccount;
-}
-
 bool neopixelWrite(Pin pin, unsigned char *rgbData, size_t rgbSize)
 {
-	if (!jshIsPinValid(pin)) { jsExceptionHere(JSET_ERROR, "Pin is not valid."); return false; }
-	
-	if (!jshGetPinStateIsManual(pin)) jshPinSetState(pin, JSHPINSTATE_GPIO_OUT);
-
-  #define _BV(bit) (1ULL<<(bit)) 
-
-  uint32_t pinMask = _BV(pin);     // bit mask for GPIO pin to write to reg
-  uint8_t *p = (uint8_t *)rgbData; // pointer to walk through pixel array
-  uint8_t *end = p + rgbSize;      // pointer to end of array
-  uint8_t pix = *p++;              // current byte being shifted out
-  uint8_t mask = 0x80;             // mask for current bit
-  uint32_t start;                  // start time of bit
-  
-  // values for 240Mhz clock , PENDING if CPU clocks changes by save modes
-  uint8_t tOne =  135;  // one bit, high typ 800ns
-  uint8_t tZero =  60;  // zero bit, high typ 300ns
-  uint8_t tLow =  255;  // total cycle, typ 1.2us
-
-  // adjust things for the pre-roll
-  p--;                            // next byte we fetch will be the first byte again
-  mask = 0x01;                    // fetch the next byte at the end of the first loop iteration
-  pinMask = 0;                    // zero mask means we set or clear no I/O pin
-
-  ets_intr_lock();
-  
-  while(1)
-	{
-    uint32_t t;
-    if (pix & mask) t = tOne;
-    else            t = tZero;
-    GPIO_REG_WRITE(GPIO_OUT_W1TS_REG, pinMask);  // Set high
-    start = _getCycleCount();                    // get start time of this bit
-    while (_getCycleCount()-start < t) ;         // busy-wait
-    GPIO_REG_WRITE(GPIO_OUT_W1TC_REG, pinMask);  // Set low
-    if (!(mask >>= 1)) {                         // Next bit/byte?
-      if (p >= end) break;                       // at end, we're done
-      pix = *p++;
-      mask = 0x80;
-      pinMask = _BV(pin);
-    }
-    while (_getCycleCount()-start < tLow) ;          // busy-wait
-	}
-  while (_getCycleCount()-start < tLow) ;            // wait for last bit
-  
-  ets_intr_unlock();
-  
-  #undef _BV
-  
-  return true;
+	return esp32_neopixelWrite(pin,rgbData, rgbSize);
 }
 
 #else
 
-bool neopixelWrite(Pin pin, unsigned char *rgbData, size_t rgbSize) {
+bool neopixelWrite(Pin pin, unsigned char *rgbData, size_t rgbSize){
   jsExceptionHere(JSET_ERROR, "Neopixel writing not implemented");
   return false;
 }
