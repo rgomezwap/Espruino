@@ -55,7 +55,7 @@ implementation on some devices - hence this library to simplify things.
   "generate" : "jswrap_neopixel_write",
   "params" : [
     ["pin", "pin", "The Pin the LEDs are connected to"],
-    ["data","JsVar","The data to write to the LED strip (must be a multiple of 3 bytes long)"]
+    ["data","JsVar","The data to write to the LED strip (must be a multiple of 3 bytes long)"],
 	["options","JsVar",["Actually we can define for ESP32 if it uses GPIO or RMT",
 						"useRMT = true for RMT to drive Neopixels"
 					   ]]
