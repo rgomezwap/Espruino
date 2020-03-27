@@ -167,15 +167,26 @@ int neopixel_init(int gpioNum){
   /*
 	be careful
 	"The order of allocation of bit-fields within a union (high-order to low-order or low-order to high-order) is implementation-defined."
+	In Xtensa ESP-IDF compiler first bitfield defined in union are the topmost bit 
   */
   
   // config bits depending of channel
-  jsWarn("API RMT debug : RMT.int_ena.ch0_tx_thr_event %d\n",RMT.int_ena.ch0_tx_thr_event);				// RIC DEBUG
   RMT.int_ena.ch0_tx_thr_event = 0;
   jsWarn("API RMT debug : RMT.int_ena.ch0_tx_thr_event %d\n",RMT.int_ena.ch0_tx_thr_event);				// RIC DEBUG
   RMT.int_ena.ch0_tx_thr_event = 1;
   jsWarn("API RMT debug : RMT.int_ena.ch0_tx_thr_event %d\n",RMT.int_ena.ch0_tx_thr_event);				// RIC DEBUG
+  
+  RMT.int_ena.ch7_tx_thr_event = 0;
+  jsWarn("API RMT debug : RMT.int_ena.ch7_tx_thr_event %d\n",RMT.int_ena.ch7_tx_thr_event);				// RIC DEBUG
+  RMT.int_ena.ch7_tx_thr_event = 1;
+  jsWarn("API RMT debug : RMT.int_ena.ch7_tx_thr_event %d\n",RMT.int_ena.ch7_tx_thr_event);				// RIC DEBUG
+  
+ 
   //RMT.int_ena.val=RMT.int_ena.val || (0x01000000 << i);				// RMT.int_ena.ch?_tx_thr_event = 1;
+  
+  
+  
+  
   RMT.int_ena.ch0_tx_end = 1;
   //RMT.int_ena.val=RMT.int_ena.val || (0x00000001 << (i*3));			// RMT.int_ena.ch?_tx_end = 1;
   
