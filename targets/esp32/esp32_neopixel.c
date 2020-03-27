@@ -164,8 +164,17 @@ int neopixel_init(int gpioNum){
 
   RMT.tx_lim_ch[i].limit = MAX_PULSES;
   
+  /*
+	be careful
+	"The order of allocation of bit-fields within a union (high-order to low-order or low-order to high-order) is implementation-defined."
+  */
+  
   // config bits depending of channel
+  jsWarn("API RMT debug : RMT.int_ena.ch0_tx_thr_event %d\n",RMT.int_ena.ch0_tx_thr_event);				// RIC DEBUG
+  RMT.int_ena.ch0_tx_thr_event = 0;
+  jsWarn("API RMT debug : RMT.int_ena.ch0_tx_thr_event %d\n",RMT.int_ena.ch0_tx_thr_event);				// RIC DEBUG
   RMT.int_ena.ch0_tx_thr_event = 1;
+  jsWarn("API RMT debug : RMT.int_ena.ch0_tx_thr_event %d\n",RMT.int_ena.ch0_tx_thr_event);				// RIC DEBUG
   //RMT.int_ena.val=RMT.int_ena.val || (0x01000000 << i);				// RMT.int_ena.ch?_tx_thr_event = 1;
   RMT.int_ena.ch0_tx_end = 1;
   //RMT.int_ena.val=RMT.int_ena.val || (0x00000001 << (i*3));			// RMT.int_ena.ch?_tx_end = 1;
@@ -194,20 +203,20 @@ bool esp32_neopixelWrite_RMT(Pin pin,unsigned char *rgbData, size_t rgbSize)
   i=neopixel_init(pin);
   if (i >=0)
 	{
-	jsWarn("API RMT debug : RMT channel %d\n",i);					// RIC DEBUG
+	jsWarn("API RMT debug : RMT channel %d\n",i);				// RIC DEBUG
 	neopixel_buffer = rgbData;
 	neopixel_len = rgbSize;
 	neopixel_pos = 0;
 	neopixel_half = 0;
 	neopixel_copy(i);
 	if (neopixel_pos < neopixel_len) neopixel_copy(i);
-	jsWarn("API RMT debug : Create sempahore for Neopixel\n");	// RIC DEBUG
+	jsWarn("API RMT debug : Create semaphore for Neopixel\n");	// RIC DEBUG
 	neopixel_sem = xSemaphoreCreateBinary();
 	RMT.conf_ch[i].conf1.mem_rd_rst = 1;
 	RMT.conf_ch[i].conf1.tx_start = 1;
-	jsWarn("API RMT debug : Waiting sempahore\n");				// RIC DEBUG
+	jsWarn("API RMT debug : Waiting semaphore\n");				// RIC DEBUG
 	xSemaphoreTake(neopixel_sem, portMAX_DELAY);
-	jsWarn("API RMT debug : sempahore free\n");					// RIC DEBUG
+	jsWarn("API RMT debug : semaphore free\n");					// RIC DEBUG
 	vSemaphoreDelete(neopixel_sem);
 	neopixel_sem = NULL;
 	return true;
