@@ -172,14 +172,14 @@ int neopixel_init(int gpioNum){
   
   // config bits depending of channel
   RMT.int_ena.ch0_tx_thr_event = 0;
-  jsWarn("API RMT debug : RMT.int_ena.ch0_tx_thr_event %d\n",RMT.int_ena.ch0_tx_thr_event);				// RIC DEBUG
+  jsWarn("API RMT debug : RMT.int_ena.ch0_tx_thr_event 0 = %d\n",RMT.int_ena.val);				// RIC DEBUG
   RMT.int_ena.ch0_tx_thr_event = 1;
-  jsWarn("API RMT debug : RMT.int_ena.ch0_tx_thr_event %d\n",RMT.int_ena.ch0_tx_thr_event);				// RIC DEBUG
+  jsWarn("API RMT debug : RMT.int_ena.ch0_tx_thr_event 1 = %d\n",RMT.int_ena.val);				// RIC DEBUG
   
   RMT.int_ena.ch7_tx_thr_event = 0;
-  jsWarn("API RMT debug : RMT.int_ena.ch7_tx_thr_event %d\n",RMT.int_ena.ch7_tx_thr_event);				// RIC DEBUG
+  jsWarn("API RMT debug : RMT.int_ena.ch7_tx_thr_event 0 = %d\n",RMT.int_ena.val);				// RIC DEBUG
   RMT.int_ena.ch7_tx_thr_event = 1;
-  jsWarn("API RMT debug : RMT.int_ena.ch7_tx_thr_event %d\n",RMT.int_ena.ch7_tx_thr_event);				// RIC DEBUG
+  jsWarn("API RMT debug : RMT.int_ena.ch7_tx_thr_event 1 = %d\n",RMT.int_ena.val);				// RIC DEBUG
   
  
   //RMT.int_ena.val=RMT.int_ena.val || (0x01000000 << i);				// RMT.int_ena.ch?_tx_thr_event = 1;
