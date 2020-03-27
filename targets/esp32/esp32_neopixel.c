@@ -111,8 +111,6 @@ void neopixel_handleInterrupt(void *arg){
   // receive the RMT channel
   uint8_t i=*((uint8_t *)arg);
   
-  i=0;	// tmp for debug purposes
-  
   portBASE_TYPE taskAwoken = 0;
   
   //if (RMT.int_st.ch0_tx_thr_event)
