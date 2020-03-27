@@ -157,10 +157,10 @@ int neopixel_init(int gpioNum){
   RMT.tx_lim_ch[i].limit = MAX_PULSES;
   
   // config bits depending of channel
-  RMT.int_ena.ch?_tx_thr_event = 1;
-  //RMT.int_ena.val=RMT.int_ena.val || (0x01000000 << i);
-  RMT.int_ena.ch?_tx_end = 1;
-  //RMT.int_ena.val=RMT.int_ena.val || (0x00000001 << (i*3));
+  RMT.int_ena.ch0_tx_thr_event = 1;
+  //RMT.int_ena.val=RMT.int_ena.val || (0x01000000 << i);				// RMT.int_ena.ch?_tx_thr_event = 1;
+  RMT.int_ena.ch0_tx_end = 1;
+  //RMT.int_ena.val=RMT.int_ena.val || (0x00000001 << (i*3));			// RMT.int_ena.ch?_tx_end = 1;
   
   neopixel_bits[0].level0 = 1;
   neopixel_bits[0].level1 = 0;
