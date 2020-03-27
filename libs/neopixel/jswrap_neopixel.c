@@ -22,7 +22,10 @@
 #include <espmissingincludes.h>
 #endif
 #ifdef ESP32
-#include "esp32_neopixel.h"
+	#include "esp32_neopixel.h"
+	#include "driver/gpio.h"
+	#include "soc/gpio_reg.h"
+	#include "rom/ets_sys.h"
 #endif
 #ifdef WIO_LTE
 #include "stm32_ws2812b_driver.h"
