@@ -28,20 +28,37 @@ rmt_item32_t items[1];
 int RMTInitChannel(Pin pin, bool pulsePolarity){
   rmt_config_t config;
   int i = getFreeRMT(pin);
-  if(i >= 0){
+  if(i >= 0)
+	{
     config.rmt_mode = RMT_MODE_TX;
     config.channel = i;
     config.gpio_num = pin;
     config.mem_block_num = 1;
-    config.tx_config.loop_en = 0;
-    config.tx_config.carrier_en = 0;
+	
+	/* ESP-IDF how carrier_duty_percent is used ->
+			if (carrier_en)
+				{
+				uint32_t duty_div, duty_h, duty_l;
+				duty_div = rmt_source_clk_hz / carrier_freq_hz;
+				duty_h = duty_div * carrier_duty_percent / 100;
+				duty_l = duty_div - duty_h;
+				rmt_ll_set_carrier_on_level(dev, channel, carrier_level);
+				rmt_ll_set_tx_carrier_high_low_ticks(dev, channel, duty_h, duty_l);
+				. . .
+	*/
+	
+	config.tx_config.loop_en = 0;
+    config.tx_config.carrier_en = 0;				// in theory we DO NOT use carrier
     config.tx_config.idle_output_en = 1;
-    if(pulsePolarity) config.tx_config.idle_level = RMT_IDLE_LEVEL_HIGH; 
-    else config.tx_config.idle_level = RMT_IDLE_LEVEL_LOW;
-    config.tx_config.carrier_duty_percent = 50;
     config.tx_config.carrier_freq_hz = 10000;
+	config.tx_config.carrier_duty_percent = 50;
     config.tx_config.carrier_level = 1;
     config.clk_div = 80;
+	
+	// when idle how do we leave the PIN high or low
+	if (pulsePolarity) config.tx_config.idle_level = RMT_IDLE_LEVEL_HIGH; 
+    else config.tx_config.idle_level = RMT_IDLE_LEVEL_LOW;
+	
     rmt_config(&config);
     rmt_driver_install(config.channel, 0, 0);
     return i;
